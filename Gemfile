@@ -74,3 +74,9 @@ gem 'rubocop'
 
 gem 'rubocop-rails'
 gem "devise", "~> 4.9"
+
+gem "bootstrap", "~> 5.3"
+
+gem "cssbundling-rails", "~> 1.4"
+
+gem "simple_form", "~> 5.3"

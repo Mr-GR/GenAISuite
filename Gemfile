@@ -73,3 +73,4 @@ gem "vite_rails", "~> 3.0"
 gem 'rubocop'
 
 gem 'rubocop-rails'
+gem "devise", "~> 4.9"

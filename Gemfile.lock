@@ -83,6 +83,7 @@ GEM
     ast (2.4.2)
     autoprefixer-rails (10.4.19.0)
       execjs (~> 2)
+    baran (0.1.12)
     base64 (0.2.0)
     bcrypt (3.1.20)
     benchmark (0.4.0)
@@ -108,6 +109,7 @@ GEM
     crass (1.0.6)
     cssbundling-rails (1.4.1)
       railties (>= 6.0.0)
+    csv (3.3.2)
     date (3.4.1)
     debug (1.10.0)
       irb (~> 1.10)
@@ -123,6 +125,17 @@ GEM
     dry-cli (1.2.0)
     erubi (1.13.1)
     execjs (2.10.0)
+    factory_bot (6.5.1)
+      activesupport (>= 6.1.0)
+    factory_bot_rails (6.4.4)
+      factory_bot (~> 6.5)
+      railties (>= 5.0.0)
+    faraday (2.12.2)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
     i18n (1.14.7)
@@ -140,6 +153,15 @@ GEM
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
     json (2.9.1)
+    json-schema (4.3.1)
+      addressable (>= 2.8)
+    langchainrb (0.19.3)
+      baran (~> 0.1.9)
+      csv
+      json-schema (~> 4)
+      matrix
+      pragmatic_segmenter (~> 0.3.0)
+      zeitwerk (~> 2.5)
     language_server-protocol (3.17.0.4)
     logger (1.6.5)
     loofah (2.24.0)
@@ -156,6 +178,8 @@ GEM
     minitest (5.25.4)
     msgpack (1.7.5)
     mutex_m (0.3.0)
+    net-http (0.6.0)
+      uri
     net-imap (0.5.5)
       date
       net-protocol
@@ -190,6 +214,7 @@ GEM
     popper_js (2.11.8)
     pp (0.6.2)
       prettyprint
+    pragmatic_segmenter (0.3.24)
     prettyprint (0.2.0)
     psych (5.2.3)
       date
@@ -291,6 +316,9 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    shoulda-matchers (6.4.0)
+      activesupport (>= 5.2.0)
+    simple_command (1.0.1)
     simple_form (5.3.1)
       actionpack (>= 5.2)
       activemodel (>= 5.2)
@@ -322,6 +350,7 @@ GEM
     unicode-display_width (3.1.4)
       unicode-emoji (~> 4.0, >= 4.0.4)
     unicode-emoji (4.0.4)
+    uri (1.0.2)
     vite_rails (3.0.19)
       railties (>= 5.1, < 9)
       vite_ruby (~> 3.0, >= 3.2.2)
@@ -366,14 +395,19 @@ DEPENDENCIES
   cssbundling-rails (~> 1.4)
   debug
   devise (~> 4.9)
+  factory_bot_rails (~> 6.4)
+  faraday (~> 2.12)
   importmap-rails
   jbuilder
+  langchainrb (~> 0.19.3)
   puma (>= 5.0)
   rails (~> 7.1.5, >= 7.1.5.1)
   rspec-rails (~> 7.0.0)
   rubocop
   rubocop-rails
   selenium-webdriver
+  shoulda-matchers (~> 6.4)
+  simple_command (~> 1.0)
   simple_form (~> 5.3)
   sprockets-rails
   sqlite3 (>= 1.4)

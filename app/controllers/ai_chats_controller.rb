@@ -9,6 +9,11 @@ class AiChatsController < PrivateController
   #Get /ai/:id 
   def show; end 
 
+  #Get /ai/new
+  def new 
+    @ai_chat = current_user.ai_chats.build
+  end
+
   private 
 
   attr_reader :ai_chat

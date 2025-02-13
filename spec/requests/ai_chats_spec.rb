@@ -124,4 +124,55 @@ RSpec.describe "AiChats", type: :request do
       end
     end
   end
+
+  describe "POST /create" do
+    let(:action) { -> { post "/ai", params: } }
+    let(:params) { { prompt: "Hello", ai_model_name: "llama3.2" } }
+
+    context 'when user is not logged in' do
+      it 'redirects to the login page' do
+        action.call
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'when user is logged in' do
+      before do
+        login_as user
+      end
+
+      it 'creates a new chat' do
+        expect { action.call }.to change { AiChat.count }.by(1)
+      end
+
+      it 'redirects to the chat page' do
+        action.call
+        expect(response).to redirect_to(ai_chat_path(AiChat.last))
+      end
+
+      it 'shows a flash message' do
+        action.call
+        expect(flash[:notice]).to eq("Chat created, please wait for a response.")
+      end
+
+      it 'enqueues a job' do
+        expect { action.call }.to have_enqueued_job(CreateAiChatMessageJob)
+      end
+
+      context 'when the chat is not created' do
+        before do
+          allow(AiChat).to receive(:build).and_return(AiChat.new)
+        end
+
+        it 'does not create a new chat' do
+          expect { action.call }.not_to change { AiChat.count }
+        end
+
+        it 'renders the new template' do
+          action.call
+          expect(response).to render_template(:new)
+        end
+      end
+    end
+  end
 end

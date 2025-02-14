@@ -8,3 +8,4 @@ export default defineConfig({
     FullReload(['config/routes.rb', 'app/views/**/*'], { delay: 100 }),
   ],
 })
+ 

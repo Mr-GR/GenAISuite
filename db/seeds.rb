@@ -10,9 +10,9 @@
 puts "## Starting seeds ###"
 
 unless User.exists?
-    users = []
-    users << { email: 'mark@chatty.com', password: 'password', password_confirmation: 'password' }
-    print("Creating #{users.size} users...")
-    User.create!(users)
-    puts ' Done '
+  users = []
+  users << { email: "mark@chatty.com", password: "password", password_confirmation: "password" }
+  print("Creating #{users.size} users...")
+  User.create!(users)
+  puts " Done "
 end

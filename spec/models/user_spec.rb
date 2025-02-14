@@ -1,35 +1,35 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe User, type: :model do
-  context 'validations' do
+  context "validations" do
     let(:valid_attributes) do
       {
-        email: 'user@respec.com',
-        password: 'password',
-        password_confirmation: 'password'
+        email:                 "user@respec.com",
+        password:              "password",
+        password_confirmation: "password"
       }
     end
 
-    let(:invalid_attributes) do 
+    let(:invalid_attributes) do
       {
-        email: 'username',
-        password: 'password',
-        password_confirmation: 'password'
+        email:                 "username",
+        password:              "password",
+        password_confirmation: "password"
       }
     end
 
-    context 'when the attributes are valid' do 
+    context "when the attributes are valid" do
       let(:user) { User.new(valid_attributes) }
 
-      it 'is valid with an email, password, and password_confrimation' do
+      it "is valid with an email, password, and password_confrimation" do
         expect(user).to be_valid
       end
     end
 
-    context 'when the attributes are invalid' do
-      let(:user) {User.new(invalid_attributes) }
+    context "when the attributes are invalid" do
+      let(:user) { User.new(invalid_attributes) }
 
-      it 'is invalid without a valid email' do 
+      it "is invalid without a valid email" do
         expect(user).to_not be_valid
       end
     end

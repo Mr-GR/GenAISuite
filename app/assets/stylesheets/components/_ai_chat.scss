@@ -83,4 +83,10 @@
     &--avatar {
       font-weight: bold;
     }
+
+    &--message {
+        &.new {
+          animation: popup 0.4s;
+        }
+    }
 }

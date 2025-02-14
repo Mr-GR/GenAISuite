@@ -1,28 +1,29 @@
 class AiChatsController < PrivateController
-  before_action :set_ai_chat, only: [ :show, :ask]
+  before_action :set_ai_chat, only: [:show,  :ask, :destroy]
 
-  #Get /ai
+  # Get /ai
   def index
     @ai_chats = current_user.ai_chats.order(created_at: :desc)
   end
 
-  #Get /ai/:id 
-  def show; end 
+  # Get /ai/:id
+  def show; end
 
-  #Get /ai/new
-  def new 
+  # Get /ai/new
+  def new
     @ai_chat = current_user.ai_chats.build
   end
 
   # Post /ai/create
   def create
-    @ai_chat = AiChat.build(user_id: current_user.id,
+    @ai_chat = AiChat.build(user_id:       current_user.id,
                             ai_model_name: ask_params[:ai_model_name].presence || CreateAiChatMessageService::DEFAULT_MODEL_NAME,
-                            title: ask_params[:prompt].truncate(100))
+                            title:         ask_params[:prompt].truncate(100))
 
     respond_to do |format|
       if @ai_chat.save
-        CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ask_params[:prompt], @ai_chat.id)
+        CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ask_params[:prompt],
+                                                                    @ai_chat.id)
 
         message = "Chat created, please wait for a response."
 
@@ -39,9 +40,29 @@ class AiChatsController < PrivateController
     return(head :no_content) if ask_params[:prompt].blank?
 
     CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ask_params[:prompt], @ai_chat.id)
-  end 
+  end
+
+  def destroy
+    @ai_chat = current_user.ai_chats.find_by(id: params[:id])
   
-  private 
+    if @ai_chat
+      @ai_chat.destroy
+      flash[:notice] = "AI chat `#{@ai_chat.title}` was successfully destroyed."
+  
+      respond_to do |format|
+        format.html { redirect_to ai_chats_path, notice: flash[:notice] }
+        format.json { head :no_content }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to ai_chats_path, alert: "Chat not found or not authorized to delete." }
+        format.json { render json: { error: "Chat not found" }, status: :not_found }
+      end
+    end
+  end
+
+
+  private
 
   attr_reader :ai_chat
 

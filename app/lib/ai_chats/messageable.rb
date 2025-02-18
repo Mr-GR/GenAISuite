@@ -27,7 +27,13 @@ module AiChats
                                                 target:  "ai_chat_#{ai_chat.id}_messages",
                                                 partial: "ai_messages/ai_message",
                                                 locals:  { ai_chat: ai_chat, ai_message:,
-is_new: true })
+                                                is_new: true })
+    end
+
+    def update_ai_message_answer(ai_message_id:, answer_chunk:)
+      Turbo::StreamsChannel.broadcast_append_to([ai_chat, 'ai_messages'],
+                                                 target: "ai_message_#{ai_message_id}_answer",
+                                                 content: answer_chunk)
     end
   end
 end

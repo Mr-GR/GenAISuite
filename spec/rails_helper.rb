@@ -33,6 +33,15 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
+  config.before(:suite) do
+    vite_test_process = `pgrep -f "bin/vite dev --mode=test"`.strip
+
+    unless vite_test_process.present?
+      puts "Starting Vite in test mode for RSpec..."
+      system("bin/vite dev --mode=test &")
+      sleep 3
+    end
+  end
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join("spec/fixtures")

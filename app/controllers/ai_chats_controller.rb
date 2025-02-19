@@ -22,8 +22,7 @@ class AiChatsController < PrivateController
 
     respond_to do |format|
       if @ai_chat.save
-        CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ask_params[:prompt],
-                                                                    @ai_chat.id)
+        CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ask_params[:prompt], @ai_chat.id)
 
         message = "Chat created, please wait for a response."
 
@@ -40,6 +39,11 @@ class AiChatsController < PrivateController
     return(head :no_content) if ask_params[:prompt].blank?
 
     CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ask_params[:prompt], @ai_chat.id)
+    
+    respond_to do |format|
+      format.html { head :no_content}
+      format.json { render json: { message: "Request received, processing..." }, status: :accepted }
+    end
   end
 
   def destroy

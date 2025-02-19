@@ -30,10 +30,33 @@ module AiChats
                                                 is_new: true })
     end
 
+    def update_ai_message(ai_message:)
+      Turbo::StreamsChannel.broadcast_replace_to([ ai_chat, "ai_messages" ],
+                                                 target: "ai_chat--message_#{ai_message.id}",
+                                                 partial: "ai_messages/ai_message",
+                                                 locals: { ai_chat: ai_chat, ai_message: })
+    end
+
     def update_ai_message_answer(ai_message_id:, answer_chunk:)
       Turbo::StreamsChannel.broadcast_append_to([ai_chat, 'ai_messages'],
                                                  target: "ai_message_#{ai_message_id}_answer",
                                                  content: answer_chunk)
     end
+
+    def notify_error(message:)
+      user = ai_chat&.user
+      return if user.nil? && ai_chat_id.present? # Prevents error if ai_chat is nil
+    
+      Turbo::StreamsChannel.broadcast_replace_to(
+        [ user, "notifications" ].compact, # Removes nil values
+        target: "ai_chat_#{ai_chat&.id || ai_chat_id}_notification",
+        partial: "layouts/error_notification",
+        locals: { message: }
+      )
+    end
+
+    # def notify_error(message:)
+    #   Turbo::StreamsChannel.broadcast_replace_to([ ai_chat.user, "notifications" ], target: "ai_chat_#{ai_chat&.id || ai_chat_id}_notification", partial: "layouts/error_notification", locals: { message: })
+    # end
   end
 end

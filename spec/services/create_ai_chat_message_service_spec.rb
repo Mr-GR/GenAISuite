@@ -10,17 +10,6 @@ describe CreateAiChatMessageService, type: :service do
   let(:llm) { double }
   let(:stubbed_answer) { "This is a stubbed answer" }
 
-  # before do
-
-  #   allow(service).to receive(:llm).and_return(llm)
-
-  #   chat_stub = allow(llm).to receive(:chat)
-
-  #   stubbed_answer.split.each.with.index do |chunk, i|
-  #     chat_completion = i == 0 ? chunk : " #{chunk}"
-
-  #     chat_stub.and_yield(double(chat_completion:))
-  #   end
   before do
     allow(service).to receive(:llm).and_return(llm)
   
@@ -60,19 +49,19 @@ describe CreateAiChatMessageService, type: :service do
   context "when ai_chat_id is provided" do
     let(:parameters) { { prompt:, ai_chat_id: ai_chat.id } }
 
-    it "calls action cable broadcasting" do
-      expect(service).to receive(:show_spinner).ordered
-      expect(service).to receive(:remove_spinner).ordered
-      expect(service).to receive(:add_ai_message).with(ai_message: an_instance_of(AiMessage)).ordered
-      service.call
-    end
-
     it "creates a new AiMessage" do
       expect { service.call }.to change { AiMessage.count }.by(1)
     end
 
     it "does NOT create a new Aichat" do
       expect { service.call }.to_not(change { AiChat.count })
+    end
+
+    it "calls action cable broadcasting" do
+      expect(service).to receive(:show_spinner).ordered
+      expect(service).to receive(:remove_spinner).ordered
+      expect(service).to receive(:add_ai_message).with(ai_message: an_instance_of(AiMessage)).ordered
+      service.call
     end
   end
 
@@ -154,6 +143,22 @@ describe CreateAiChatMessageService, type: :service do
                                                                             ai_chat: ai_chat, ai_message:, is_new: true
                                                                           })
       service.send(:add_ai_message, ai_message: ai_message)
+    end
+  end
+
+  context "when the llm raise an error" do 
+    let(:parameters) { valid_parameters }
+    let(:error_message) { 'An error occured' }
+
+    before do
+      allow(llm).to receive(:chat).and_raise(StandardError.new(error_message))
+    end
+
+    it_behaves_like 'a service that fails'
+
+    it 'notify the error' do
+      expect(service).to receive(:notify_error).with(message: error_message)
+      service.call
     end
   end
 end

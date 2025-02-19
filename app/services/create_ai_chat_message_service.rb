@@ -47,23 +47,41 @@ class CreateAiChatMessageService
     errors.add(:prompt, "is required") if prompt.blank?
 
     if errors.any?
-      # notify_error
+      notify_error(message: errors.full_messages.to_sentence)
       return
     end
 
-    show_spinner(message: prompt)
+    show_spinner
+    ai_message = nil
+    answer_chunks = []
 
-    llm_response = llm.chat(messages:)
+    llm.chat(messages:) do |response_chunk|
+      unless ai_message
+        remove_spinner
+        ai_message = ai_chat.ai_messages.create!(prompt:, answer: "")
+        add_ai_message(ai_message:)
+      end
 
-    remove_spinner
+      answer_chunk = response_chunk.chat_completion
+      answer_chunks << answer_chunk
+      update_ai_message_answer(ai_message_id: ai_message.id, answer_chunk:)
+      sleep 0.01
 
-    ai_message = ai_chat.ai_messages.create(prompt:, answer: llm_response.chat_completion)
+      if answer_chunks.size % 50 == 0
+        ai_message.update(answer: answer_chunks.join)
+        update_ai_message(ai_message:)
+        sleep 0.05
+      end
+    end
 
-    add_ai_message(ai_message:)
+    ai_message.update(answer: answer_chunks.join)
+    update_ai_message(ai_message:)
 
     ai_message
-  rescue StandardError
-    # notify_error
+  rescue StandardError => e
+    remove_spinner
+    errors.add(:generic, e.message)
+    notify_error(message: e.message)
   end
 
   private

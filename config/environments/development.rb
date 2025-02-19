@@ -64,6 +64,8 @@ Rails.application.configure do
 
   config.action_cable.url = ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" }
 
+  config.action_cable.allowed_request_origins = ["http://localhost:5100"]
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 

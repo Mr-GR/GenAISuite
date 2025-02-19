@@ -94,3 +94,5 @@ gem "shoulda-matchers", "~> 6.4"
 gem "simple_command", "~> 1.0"
 
 gem 'sassc-rails'
+gem "redcarpet", "~> 3.6"
+gem "rouge", "~> 4.5"

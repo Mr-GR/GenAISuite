@@ -1,5 +1,5 @@
 class AiChatsController < PrivateController
-  before_action :set_ai_chat, only: [:show,  :ask, :destroy]
+  before_action :set_ai_chat, only: [:show, :destroy]
 
   # Get /ai
   def index
@@ -17,12 +17,12 @@ class AiChatsController < PrivateController
   # Post /ai/create
   def create
     @ai_chat = AiChat.build(user_id:       current_user.id,
-                            ai_model_name: ask_params[:ai_model_name].presence || CreateAiChatMessageService::DEFAULT_MODEL_NAME,
-                            title:         ask_params[:prompt].truncate(100))
+                            ai_model_name: ai_messages_params[:ai_model_name].presence || CreateAiChatMessageService::DEFAULT_MODEL_NAME,
+                            title:         ai_messages_params[:prompt].truncate(100))
 
     respond_to do |format|
       if @ai_chat.save
-        CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ask_params[:prompt], @ai_chat.id)
+        CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ai_messages_params[:prompt], @ai_chat.id)
 
         message = "Chat created, please wait for a response."
 
@@ -32,17 +32,6 @@ class AiChatsController < PrivateController
         format.html { render(:new, status: :unprocessable_entity) }
         format.json { render(json: @ai_chat.errors, status: :unprocessable_entity) }
       end
-    end
-  end
-
-  def ask
-    return(head :no_content) if ask_params[:prompt].blank?
-
-    CreateAiChatMessageJob.set(wait: 0.5.seconds).perform_later(ask_params[:prompt], @ai_chat.id)
-    
-    respond_to do |format|
-      format.html { head :no_content}
-      format.json { render json: { message: "Request received, processing..." }, status: :accepted }
     end
   end
 
@@ -74,7 +63,7 @@ class AiChatsController < PrivateController
     @ai_chat = current_user.ai_chats.includes(:ai_messages).find(params[:id])
   end
 
-  def ask_params
+  def ai_messages_params
     params.permit(:prompt, :ai_model_name)
   end
 end

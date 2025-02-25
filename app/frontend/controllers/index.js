@@ -10,3 +10,6 @@ application.register("generic-form", generic_form_controller)
 
 import BootstrapController from "./bootstrap_controller"
 application.register("bootstrap", BootstrapController)
+
+import SubmitOnEnterController from "./submit_on_enter_controller"
+application.register("submit-on-enter", SubmitOnEnterController)

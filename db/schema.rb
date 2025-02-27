@@ -11,8 +11,11 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.1].define(version: 2025_02_24_231958) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "ai_chats", force: :cascade do |t|
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.string "title"
     t.string "ai_model_name"
     t.datetime "created_at", null: false
@@ -21,7 +24,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_24_231958) do
   end
 
   create_table "ai_messages", force: :cascade do |t|
-    t.integer "ai_chat_id", null: false
+    t.bigint "ai_chat_id", null: false
     t.text "prompt"
     t.text "answer"
     t.datetime "created_at", null: false

@@ -13,25 +13,40 @@ ENV RAILS_ENV="production" \
     BUNDLE_PATH="/usr/local/bundle" \
     BUNDLE_WITHOUT="development test"
 
-# Install necessary system packages (including PostgreSQL support)
+# Install system dependencies, Node.js, Yarn, and Redis client
 RUN apt-get update -qq && apt-get install --no-install-recommends -y \
-    build-essential git libvips pkg-config libpq-dev curl && \
+    build-essential git libvips pkg-config libpq-dev curl redis-tools && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g yarn && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install Bundler 2.6 explicitly
+RUN gem install bundler -v 2.6.0 -N
+
+# Install Foreman globally
+RUN gem install foreman -N
 
 # Throw-away build stage to reduce final image size
 FROM base as build
 
 # Copy Gemfile and Gemfile.lock before installing gems
 COPY Gemfile Gemfile.lock ./
-RUN bundle install --without development test && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
-    bundle exec bootsnap precompile --gemfile
+
+# Remove duplicate gems from Gemfile.lock
+RUN bundle lock --remove-platform x86_64-linux && bundle install --without development test && \
+    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
 
 # Copy application code
 COPY . .
 
-# Ensure Rails is installed in the image
-RUN bundle exec gem install rails
+# Install JavaScript dependencies (for Vite and CSS Bundling)
+RUN yarn install
+
+# Ensure Sidekiq and Rails executables are installed
+RUN bundle binstubs bundler --force && \
+    bundle binstubs sidekiq --force && \
+    bundle binstubs rails --force
 
 # Final stage for the application
 FROM base
@@ -42,7 +57,7 @@ COPY --from=build /rails /rails
 
 # Set non-root user for security
 RUN useradd rails --create-home --shell /bin/bash && \
-    chown -R rails:rails db log storage tmp
+    chown -R rails:rails /rails db log storage tmp node_modules
 USER rails:rails
 
 # Set up environment variables
@@ -53,5 +68,5 @@ ENV DATABASE_URL="postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${D
 # Expose the Rails server port
 EXPOSE 3000
 
-# Ensure Rails starts
-CMD ["bin/rails", "server", "-b", "0.0.0.0"]
+# Start Foreman to manage multiple processes (Rails, Vite, Sidekiq)
+CMD ["foreman", "start", "-f", "Procfile"]

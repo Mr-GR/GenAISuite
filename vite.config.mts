@@ -10,20 +10,21 @@ export default defineConfig({
     FullReload(['config/routes.rb', 'app/views/**/*'], { delay: 100 }),
   ],
   build: {
-    outDir: "../../public/vite",
+    outDir: "public/vite",
     rollupOptions: {
       external: ['@hotwired/turbo-rails', '@hotwired/stimulus'],
       input: {
-        application: path.resolve(__dirname, 'app/frontend/entrypoints/application.js'), 
+        application: path.resolve('app/frontend/entrypoints/application.js'),
       },
       output: {
-        entryFileNames: 'app/frontend/entrypoints/[name].js',
+        entryFileNames: '[name].js',
       },
     },
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, 'app/frontend'),
+      '@': path.resolve('app/frontend'),
     },
   },
 })
+

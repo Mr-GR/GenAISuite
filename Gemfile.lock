@@ -163,6 +163,10 @@ GEM
     json (2.9.1)
     json-schema (4.3.1)
       addressable (>= 2.8)
+    kredis (1.7.0)
+      activemodel (>= 6.0.0)
+      activesupport (>= 6.0.0)
+      redis (>= 4.2, < 6)
     langchainrb (0.19.3)
       baran (~> 0.1.9)
       csv
@@ -345,6 +349,12 @@ GEM
       websocket (~> 1.0)
     shoulda-matchers (6.4.0)
       activesupport (>= 5.2.0)
+    sidekiq (7.3.9)
+      base64
+      connection_pool (>= 2.3.0)
+      logger
+      rack (>= 2.2.4)
+      redis-client (>= 0.22.2)
     simple_command (1.0.1)
     simple_form (5.3.1)
       actionpack (>= 5.2)
@@ -419,6 +429,7 @@ DEPENDENCIES
   factory_bot_rails (~> 6.4)
   faraday (~> 2.12)
   jbuilder
+  kredis
   langchainrb (~> 0.19.3)
   pg
   puma (>= 5.0)
@@ -433,6 +444,7 @@ DEPENDENCIES
   sassc-rails
   selenium-webdriver
   shoulda-matchers (~> 6.4)
+  sidekiq
   simple_command (~> 1.0)
   simple_form (~> 5.3)
   sprockets-rails
